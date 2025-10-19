@@ -4,7 +4,7 @@ import { EmailInput } from "@/shared/inputs/EmailInput";
 import { PasswordInput } from "@/shared/inputs/PasswordInput";
 import { SubmitButton } from "@/shared/buttons/SubmitButton";
 import { signUpAction } from "@/actions/auth/signup";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { FullnameInput } from "@/shared/inputs/FullnameInput";
 
 export function SignUpForm() {
@@ -13,8 +13,14 @@ export function SignUpForm() {
     success: false,
     values: {}
   });
-  const errors = formState.errors || {};
-  const values = formState.values || {};
+  const errors = formState?.errors || {};
+  const values = formState?.values || {};
+
+  useEffect(() => {
+    if (values.email) {
+      sessionStorage.setItem("signup_email", values.email);
+    }
+  }, [values.email]);
 
   return (
     <form action={action} className="flex flex-col gap-5">

@@ -1,11 +1,9 @@
 "use client";
 
 import { EmailInput } from "@/shared/inputs/EmailInput";
-import { PasswordInput } from "@/shared/inputs/PasswordInput";
 import { SubmitButton } from "@/shared/buttons/SubmitButton";
-import { signInAction } from "@/actions/auth/signin";
+import { forgotPasswordAction } from "@/actions/auth/forgot-password";
 import { useActionState, useState, useEffect } from "react";
-import Link from "next/link";
 
 const initialState = {
   success: false,
@@ -13,8 +11,8 @@ const initialState = {
   values: {}
 };
 
-export function SignInForm() {
-  const [formState, action] = useActionState(signInAction, initialState);
+export function ForgotPasswordForm() {
+  const [formState, action] = useActionState(forgotPasswordAction, initialState);
   const [localErrors, setLocalErrors] = useState({});
 
   useEffect(() => {
@@ -32,24 +30,22 @@ export function SignInForm() {
     }
   };
 
-  const handlePasswordChange = () => {
-    if (localErrors.password) {
-      setLocalErrors((prev) => {
-        const { password, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
   const values = formState?.values || {};
 
   return (
     <form action={action} className="flex flex-col gap-5">
+      {formState.success && (
+        <div className="text-sm text-green-600 dark:text-green-400 text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+          Password reset link has been sent to your email
+        </div>
+      )}
+
       {localErrors?.root && (
         <div className="text-sm text-red-500 text-center">
           {localErrors.root[0]}
         </div>
       )}
+
       <div>
         <EmailInput name="email" onChange={handleEmailChange} defaultValue={values.email || ""} />
         {localErrors?.email && (
@@ -57,25 +53,10 @@ export function SignInForm() {
         )}
       </div>
 
-      <div>
-        <PasswordInput name="password" onChange={handlePasswordChange} />
-        {localErrors?.password && (
-          <p className="text-sm text-red-500 mt-1">{localErrors.password[0]}</p>
-        )}
-        <div className="mt-2 text-right">
-          <Link 
-            href="/forgot-password" 
-            className="text-sm text-blue-600 hover:underline dark:text-blue-400"
-          >
-            Forgot password?
-          </Link>
-        </div>
-      </div>
-
       <SubmitButton
         className="bg-blue-500 hover:bg-blue-600 text-white font-medium"
-        label="Login"
-        loadingLabel="Logging In..."
+        label="Send Reset Link"
+        loadingLabel="Sending..."
       />
     </form>
   );

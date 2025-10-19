@@ -1,16 +1,16 @@
 "use server"
 
+import { getClient } from "@/lib/Supabase/server";
 import { validateEmail, validatePassword, validateConfirmPassword, validateFullname } from "@/utils/validators";
+import { redirect } from "next/navigation";
 
 export async function signUpAction(prevState, formData) {
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  const email = formData.get("email");
+  const fullname = formData.get("fullname");
+  const password = formData.get("password");
+  const confirmPassword = formData.get("confirmPassword");
 
-  const email = formData.get("email")
-  const fullname = formData.get("fullname")
-  const password = formData.get("password")
-  const confirmPassword = formData.get("confirmPassword")
-
-  const errors = {}
+  const errors = {};
 
   const emailError = validateEmail(email);
   if (emailError) {
@@ -40,11 +40,43 @@ export async function signUpAction(prevState, formData) {
         fullname,
         email,
       }
-    }
+    };
   }
 
-  return {
-    success: true,
-    values: {}
+  const supabase = await getClient();
+
+  const { data: authData, error: signUpError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullname,
+      },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback`,
+    }
+  });
+
+  if (signUpError) {
+    return {
+      success: false,
+      errors: { root: [signUpError.message] },
+      values: {
+        fullname,
+        email,
+      }
+    };
   }
+
+  if (authData.user && authData.user.identities && authData.user.identities.length === 0) {
+    return {
+      success: false,
+      errors: { email: ["An account with this email already exists"] },
+      values: {
+        fullname,
+        email,
+      }
+    };
+  }
+
+  redirect("/confirm-email");
 }
