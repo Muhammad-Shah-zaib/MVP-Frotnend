@@ -4,6 +4,7 @@ import { EmailInput } from "@/shared/inputs/EmailInput";
 import { SubmitButton } from "@/shared/buttons/SubmitButton";
 import { forgotPasswordAction } from "@/actions/auth/forgot-password";
 import { useActionState, useState, useEffect } from "react";
+import { EMPTY_STRING } from "@/constants/general";
 
 const initialState = {
   success: false,
@@ -47,7 +48,7 @@ export function ForgotPasswordForm() {
       )}
 
       <div>
-        <EmailInput name="email" onChange={handleEmailChange} defaultValue={values.email || ""} />
+        <EmailInput name="email" onChange={handleEmailChange} defaultValue={values.email || EMPTY_STRING} />
         {localErrors?.email && (
           <p className="text-sm text-red-500 mt-1">{localErrors.email[0]}</p>
         )}

@@ -1,4 +1,6 @@
 import { SignInForm } from "@/components/auth/signin/SignInForm";
+import { GoogleSignInButton } from "@/components/auth/shared/GoogleSignInButton";
+import { DividerWithText } from "@/components/auth/shared/DividerWithText";
 import Link from "next/link";
 
 export default function SignInPage() {
@@ -9,6 +11,10 @@ export default function SignInPage() {
           Welcome to Artsensei
         </h1>
       </div>
+
+      <GoogleSignInButton />
+
+      <DividerWithText />
 
       <SignInForm />
 

@@ -1,4 +1,6 @@
 import { SignUpForm } from "@/components/auth/signup/SignUpForm"
+import { GoogleSignInButton } from "@/components/auth/shared/GoogleSignInButton"
+import { DividerWithText } from "@/components/auth/shared/DividerWithText"
 import Link from "next/link"
 
 export default function SignUpPage() {
@@ -9,6 +11,10 @@ export default function SignUpPage() {
           Create your account
         </h1>
       </div>
+
+      <GoogleSignInButton />
+
+      <DividerWithText />
 
       <SignUpForm />
 

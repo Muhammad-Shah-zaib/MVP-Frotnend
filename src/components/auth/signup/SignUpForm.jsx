@@ -6,6 +6,7 @@ import { SubmitButton } from "@/shared/buttons/SubmitButton";
 import { signUpAction } from "@/actions/auth/signup";
 import { useActionState, useEffect } from "react";
 import { FullnameInput } from "@/shared/inputs/FullnameInput";
+import { EMPTY_STRING } from "@/constants/general";
 
 export function SignUpForm() {
   const [formState, action] = useActionState(signUpAction, {
@@ -25,13 +26,13 @@ export function SignUpForm() {
   return (
     <form action={action} className="flex flex-col gap-5">
       <div>
-        <FullnameInput name="fullname" defaultValue={values.fullname || ""} />
+  <FullnameInput name="fullname" defaultValue={values.fullname || EMPTY_STRING} />
         {errors.fullname && (
           <p className="text-sm text-red-500 mt-1">{errors.fullname[0]}</p>
         )}
       </div>
       <div>
-        <EmailInput name="email" defaultValue={values.email || ""} />
+  <EmailInput name="email" defaultValue={values.email || EMPTY_STRING} />
         {errors.email && (
           <p className="text-sm text-red-500 mt-1">{errors.email[0]}</p>
         )}

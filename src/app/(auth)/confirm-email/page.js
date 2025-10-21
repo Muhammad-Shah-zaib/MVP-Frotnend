@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { EMPTY_STRING } from "@/constants/general";
 import { useRouter } from "next/navigation";
 import { ConfirmEmailContent } from "@/components/auth/confirm-email/ConfirmEmailContent";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function ConfirmEmailPage() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(EMPTY_STRING);
   const router = useRouter();
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import { SubmitButton } from "@/shared/buttons/SubmitButton";
 import { signInAction } from "@/actions/auth/signin";
 import { useActionState, useState, useEffect } from "react";
 import Link from "next/link";
+import { EMPTY_STRING } from "@/constants/general";
 
 const initialState = {
   success: false,
@@ -51,7 +52,7 @@ export function SignInForm() {
         </div>
       )}
       <div>
-        <EmailInput name="email" onChange={handleEmailChange} defaultValue={values.email || ""} />
+  <EmailInput name="email" onChange={handleEmailChange} defaultValue={values.email || EMPTY_STRING} />
         {localErrors?.email && (
           <p className="text-sm text-red-500 mt-1">{localErrors.email[0]}</p>
         )}
