@@ -4,7 +4,7 @@ import UploadButton from "./UploadButton";
 
 const CameraActions = () => {
   return (
-    <div className="w-full h-full flex items-center justify-center gap-6">
+    <div className="w-full h-full flex gap-6 items-center justify-center">
       <UploadButton />
       <PlayButton />
       <CameraButton />

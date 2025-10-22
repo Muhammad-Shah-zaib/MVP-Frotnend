@@ -25,10 +25,23 @@ export const useChatStore = create((set, get) => ({
     });
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+      let stream = null;
+      
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: true,
+        });
+      } catch (backCameraError) {
+        console.log("Back camera not available, trying front camera:", backCameraError);
+        
+        // If back camera fails, fall back to front camera (user-facing)
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: true,
+        });
+      }
+
       set({
         cameraStream: stream,
         isCameraActive: true,

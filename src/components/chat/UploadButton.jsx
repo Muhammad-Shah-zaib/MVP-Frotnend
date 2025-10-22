@@ -2,17 +2,27 @@
 
 import { Image } from "lucide-react";
 import { useChatStore } from "@/store";
-import { generateSideButtonClass } from "@/utils/chatHelpers";
+import "./styles.css";
 
 const UploadButton = () => {
   const isCameraActive = useChatStore((state) => state.isCameraActive);
 
+  if (!isCameraActive) return null;
+
   return (
-    <div className={generateSideButtonClass(isCameraActive)}>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        <Image className="w-8 h-8 text-primary" />
+    <button
+      className="neumorphic-button btn-round upload-button"
+      style={{ 
+        width: '55px', 
+        height: '55px', 
+        flexShrink: 0,
+      }}
+      onClick={() => {}}
+    >
+      <div style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Image style={{ width: '28px', height: '28px', color: '#a3b1c6' }} />
       </div>
-    </div>
+    </button>
   );
 };
 

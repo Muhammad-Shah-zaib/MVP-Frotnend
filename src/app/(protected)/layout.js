@@ -15,7 +15,7 @@ export default async function ProtectedLayout({ children }) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-[90vh]">
+    <div className="flex flex-col bg-gray-100 items-center justify-center w-full min-h-[90vh]">
       <div className="max-w-[400px] w-full">
         <ChatHeader />
       </div>

@@ -23,6 +23,9 @@ const PlayButton = () => {
 
   const isLoading = permissionState === PERMISSION_STATES.REQUESTING;
   const isAudioLoading = audioPermissionState === PERMISSION_STATES.REQUESTING;
+  const showGlow = !isCameraActive
+  console.log(showGlow)
+  const isActive = isCameraActive && isAudioActive;
 
   const handleClick = () => {
     if (!isCameraActive) {
@@ -41,32 +44,45 @@ const PlayButton = () => {
   };
 
   return (
-    <div className="relative w-[140px] h-[140px]">
-      {isCameraActive && isAudioActive && (
-        <AudioWaveform isActive={isAudioActive} size={120} />
+    <div style={{ position: 'relative', width: '150px', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {isActive && (
+        <AudioWaveform isActive={isAudioActive} size={135} />
       )}
 
       <button
         onClick={handleClick}
         disabled={isLoading || isAudioLoading}
-        className={`play-button-wrapper hover:scale-[0.97] rounded-full flex justify-center items-center border border-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${
-          isCameraActive ? " w-16 h-16 " : " w-18 h-18 "
-        } transition-all cursor-pointer ${
-          isLoading || isAudioLoading ? "opacity-50 cursor-not-allowed" : ""
-        } ${
-          !isCameraActive && !isLoading && !isAudioLoading ? "should-click" : ""
-        } ${isCameraActive && isAudioActive ? "active-glow" : ""}`}
+        className={`start-button ${showGlow ? "should-click" : ""} ${isCameraActive ? "active" : ""}`}
+        style={{ 
+          width: '60px',
+          height: '60px',
+          borderRadius: '50%',
+          position: 'absolute',
+          opacity: isLoading || isAudioLoading ? 0.5 : 1,
+          cursor: isLoading || isAudioLoading ? 'not-allowed' : 'pointer',
+          ...(isCameraActive && {
+            boxShadow: 'inset 0.25rem 0.25rem 0.5rem rgba(163, 177, 198, 0.5), inset -0.25rem -0.25rem 0.5rem rgba(255, 255, 255, 0.8)'
+          })
+        }}
       >
-       
+        <div style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {isLoading || isAudioLoading ? (
-            <Loader2
-              className={`w-8 h-8 text-primary absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin`}
+            <div 
+              style={{ 
+                width: '20px', 
+                height: '20px', 
+                borderRadius: '50%', 
+                border: '2px solid #a3b1c6', 
+                borderTop: '2px solid transparent', 
+                animation: 'spin 1s linear infinite' 
+              }}
             />
           ) : isCameraActive ? (
-            <AudioLines className="w-8 h-8 text-primary absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+            <AudioLines style={{ width: '38px', height: '38px', color: '#a3b1c6' }} />
           ) : (
-            <Play className="w-8 h-8 text-gray-500 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+            <Play style={{ width: '38px', height: '38px', color: '#a3b1c6' }} />
           )}
+        </div>
       </button>
     </div>
   );
