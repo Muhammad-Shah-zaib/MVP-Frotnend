@@ -9,7 +9,7 @@ const ChatComponent = () => {
       <div className="flex flex-col w-full h-[78%] p-4 pt-0 pb-8">
         <MediaViewer />
       </div>
-      <div className="h-[19%] w-full px-4">
+      <div className="h-[17%] w-full px-4">
         <CameraActions />
       </div>
     </div>

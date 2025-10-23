@@ -1,5 +1,5 @@
-import ChatComponent from "@/components/chat/ChatComponent";
 import ChatHeader from "@/components/chat/header";
+import TextChatComponent from "@/components/text-chat/TextChatComponent";
 
 async function ChatPage() {
   return (
@@ -9,7 +9,7 @@ async function ChatPage() {
       </div>
 
       <div className="h-[90vh] w-full overflow-hidden">
-        <ChatComponent />
+        <TextChatComponent />
       </div>
     </div>
   );

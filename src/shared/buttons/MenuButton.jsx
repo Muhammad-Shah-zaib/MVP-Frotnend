@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { Menu, History, Settings, Phone, ChartBar } from "lucide-react";
+import { Menu, History, Settings, Phone, ChartBar, Text } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Link from "next/link";
 
@@ -9,7 +9,8 @@ function MenuButton() {
   const [open, setOpen] = useState(false);
   
   const menuItems = [
-    { icon: ChartBar, label: "Chat", href: "/chat" },
+    { icon: ChartBar, label: "Voice Chat", href: "/chat" },
+    { icon: Text, label: "Text Chat", href: "/text-chat" },
     { icon: History, label: "History", href: "/history" },
     { icon: Settings, label: "Settings", href: "/settings" },
     { icon: Phone, label: "Contact", href: "/contact" },
