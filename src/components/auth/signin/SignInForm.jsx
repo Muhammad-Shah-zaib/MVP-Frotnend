@@ -78,7 +78,7 @@ export function SignInForm() {
       </div>
 
       <SubmitButton
-        className="bg-blue-500 hover:bg-blue-600 text-white font-medium"
+        className="bg-blue-500 hover:bg-blue-600 text-white font-medium w-full"
         label="Login"
         loadingLabel="Logging In..."
       />

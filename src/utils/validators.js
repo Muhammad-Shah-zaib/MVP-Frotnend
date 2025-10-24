@@ -68,7 +68,7 @@ export function validateFullname(fullname) {
   }
 
   if (typeof fullname !== 'string' || fullname.trim().length < 2) {
-    return ["Please enter your full name"];
+    return ["Please enter your valid full name"];
   }
 
   return null;

@@ -3,6 +3,9 @@ import React from "react";
 import BackButton from "./BackButton";
 import { getClient } from "@/lib/Supabase/server";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import { signOutAction } from "@/actions/auth/signout";
 
 const SettingsComponent = async () => {
   const supabase = await getClient();
@@ -16,7 +19,7 @@ const SettingsComponent = async () => {
   }
 
   return (
-    <section className="h-full w-full p-4 space-y-4">
+    <section id="settings-ctn" className="h-full w-full p-4 space-y-4">
       {/* header */}
       <div className="flex items-center gap-4 text-gray-700 ">
         <BackButton />
@@ -40,12 +43,12 @@ const SettingsComponent = async () => {
         <div className="text-2xl text-gray-500 my-4">Account Settings</div>
 
         <div className="flex flex-col gap-4">
-          <div className="w-full text-lg p-2 rounded-lg group hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center justify-between">
+          <Link href="/settings/edit-profile" className="w-full text-lg p-2 rounded-lg group hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center justify-between">
             Edit Profile
             <span>
               <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-gray-900 transition-all duration-300" />
             </span>
-          </div>
+          </Link>
           <div className="w-full text-lg p-2 rounded-lg group hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center justify-between">
             Account Details
             <span>
@@ -85,6 +88,12 @@ const SettingsComponent = async () => {
           </div>
         </div>
       </section>
+
+      <Separator />
+      {/* Logout button */}
+      <form action={signOutAction}>
+        <Button type="submit" className="w-full">Logout</Button>
+      </form>
     </section>
   );
 };
