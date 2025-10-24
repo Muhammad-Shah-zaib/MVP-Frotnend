@@ -11,7 +11,7 @@ import { EMPTY_STRING } from "@/constants/general";
 const initialState = {
   success: false,
   errors: {},
-  values: {}
+  values: {},
 };
 
 export function SignInForm() {
@@ -52,7 +52,11 @@ export function SignInForm() {
         </div>
       )}
       <div>
-  <EmailInput name="email" onChange={handleEmailChange} defaultValue={values.email || EMPTY_STRING} />
+        <EmailInput
+          name="email"
+          onChange={handleEmailChange}
+          defaultValue={values.email || EMPTY_STRING}
+        />
         {localErrors?.email && (
           <p className="text-sm text-red-500 mt-1">{localErrors.email[0]}</p>
         )}
@@ -64,8 +68,8 @@ export function SignInForm() {
           <p className="text-sm text-red-500 mt-1">{localErrors.password[0]}</p>
         )}
         <div className="mt-2 text-right">
-          <Link 
-            href="/forgot-password" 
+          <Link
+            href="/forgot-password"
             className="text-sm text-blue-600 hover:underline dark:text-blue-400"
           >
             Forgot password?

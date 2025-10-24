@@ -4,8 +4,10 @@ import { Lock, Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { useFormStatus } from "react-dom"
 
 export function PasswordInput({ label, className, ...props }) {
+   const { pending } = useFormStatus()
   const [show, setShow] = useState(false)
 
   return (
@@ -35,8 +37,9 @@ export function PasswordInput({ label, className, ...props }) {
 
         <button
           type="button"
+          disabled={pending}
           onClick={() => setShow(!show)}
-          className="absolute inset-y-0 right-3 flex items-center text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+          className="absolute inset-y-0 right-3 flex disabled:text-zinc-400 items-center text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
         >
           {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
