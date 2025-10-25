@@ -16,8 +16,11 @@ export const useChatStore = create((set, get) => ({
   audioPermissionState: PERMISSION_STATES.IDLE,
   permissionError: EMPTY_STRING,
   audioPermissionError: EMPTY_STRING,
+  capturedImage: null,
+  uploadedImage: null,
+  showUploadInMain: false,
+  showCapturedInMain: true,
 
-  // Actions
   startCamera: async () => {
     set({
       permissionState: PERMISSION_STATES.REQUESTING,
@@ -33,9 +36,6 @@ export const useChatStore = create((set, get) => ({
           audio: true,
         });
       } catch (backCameraError) {
-        console.log("Back camera not available, trying front camera:", backCameraError);
-        
-        // If back camera fails, fall back to front camera (user-facing)
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "user" },
           audio: true,
@@ -72,6 +72,9 @@ export const useChatStore = create((set, get) => ({
       isCameraActive: false,
       permissionState: PERMISSION_STATES.IDLE,
       permissionError: EMPTY_STRING,
+      capturedImage: null,
+      uploadedImage: null,
+      showUploadInMain: false,
     });
   },
 
@@ -142,5 +145,82 @@ export const useChatStore = create((set, get) => ({
     
     if (isAudioActive) stopAudio();
     else startAudio();
+  },
+
+  captureFrame: (videoElement) => {
+    const { capturedImage, uploadedImage, showUploadInMain } = get();
+    
+    if (capturedImage) {
+      set({ capturedImage: null });
+      return;
+    }
+
+    if (!videoElement || !videoElement.videoWidth || !videoElement.videoHeight) {
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(videoElement, 0, 0);
+    
+    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    
+    if (uploadedImage) {
+      set({
+        capturedImage: imageDataUrl,
+        showCapturedInMain: showUploadInMain ? false : true,
+      });
+    } else {
+      set({
+        capturedImage: imageDataUrl,
+      });
+    }
+  },
+
+  uploadImage: (file) => {
+    const { capturedImage } = get();
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (capturedImage) {
+        set({
+          uploadedImage: e.target.result,
+          showUploadInMain: true,
+          showCapturedInMain: false,
+        });
+      } else {
+        set({
+          uploadedImage: e.target.result,
+          capturedImage: null,
+          showUploadInMain: true,
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  },
+
+  swapImageAndCamera: () => {
+    const { showUploadInMain, capturedImage, uploadedImage } = get();
+    
+    if (capturedImage && uploadedImage) {
+      set({
+        showCapturedInMain: !get().showCapturedInMain,
+      });
+    } else {
+      set({
+        showUploadInMain: !showUploadInMain,
+      });
+    }
+  },
+
+  clearImages: () => {
+    set({
+      capturedImage: null,
+      uploadedImage: null,
+      showUploadInMain: false,
+      showCapturedInMain: true,
+    });
   }
 }));

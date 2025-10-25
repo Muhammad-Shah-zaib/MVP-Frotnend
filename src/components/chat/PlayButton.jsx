@@ -20,15 +20,16 @@ const PlayButton = () => {
   const audioPermissionState = useChatStore(
     (state) => state.audioPermissionState
   );
+  const clearImages = useChatStore((state) => state.clearImages);
 
   const isLoading = permissionState === PERMISSION_STATES.REQUESTING;
   const isAudioLoading = audioPermissionState === PERMISSION_STATES.REQUESTING;
   const showGlow = !isCameraActive
-  console.log(showGlow)
   const isActive = isCameraActive && isAudioActive;
 
   const handleClick = () => {
     if (!isCameraActive) {
+      clearImages();
       toggleCamera();
       setTimeout(() => {
         if (!isAudioActive) {

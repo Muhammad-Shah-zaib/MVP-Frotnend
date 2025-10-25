@@ -1,3 +1,5 @@
+"use client";
+
 import CameraButton from "./CameraButton";
 import PlayButton from "./PlayButton";
 import UploadButton from "./UploadButton";
