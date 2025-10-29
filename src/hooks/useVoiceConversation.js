@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
+import { useImageBillboardStore } from "@/store/imageBillboard/imageBillboardStore";
 import { useConversation } from "@elevenlabs/react";
 import { getElevenLabsSignedUrl } from "@/actions/elevenlabs";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
@@ -17,6 +18,8 @@ export const useVoiceConversation = () => {
     setSpeaking,
     reset
   } = useElevenLabsStore();
+
+  const { setIsOpen } = useImageBillboardStore();
 
   const conversation = useConversation({
     onConnect: () => {
@@ -40,6 +43,11 @@ export const useVoiceConversation = () => {
     onModeChange: (mode) => {
       console.log("Mode changed:", mode);
       setSpeaking(mode.mode === "speaking");
+    },
+    clientTools: {
+      showImageOnScreen: async () => {
+        setIsOpen(true);
+      },
     }
   });
 

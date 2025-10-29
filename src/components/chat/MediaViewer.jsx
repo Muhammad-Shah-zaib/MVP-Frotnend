@@ -70,20 +70,17 @@ const MediaViewer = () => {
     );
   }
 
-  if (capturedImage) {
-    return <ImageView imageSrc={capturedImage} />;
-  }
+  if (capturedImage) return <ImageView imageSrc={capturedImage} />;
 
-  if (uploadedImage && showUploadInMain) {
+  if (uploadedImage && showUploadInMain)
     return (
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
         <ImageView imageSrc={uploadedImage} />
         <CameraOverlay />
       </div>
     );
-  }
 
-  if (uploadedImage && !showUploadInMain && isCameraActive) {
+  if (uploadedImage && !showUploadInMain && isCameraActive)
     return (
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
         <ActiveVideoWrapper videoRef={videoRef} />
@@ -116,14 +113,15 @@ const MediaViewer = () => {
         </div>
       </div>
     );
-  }
 
   if (permissionState === PERMISSION_STATES.REQUESTING)
     return <RequestingView />;
+
   if (permissionState === PERMISSION_STATES.DENIED && permissionError)
     return (
       <DeniedView permissionError={permissionError} onRetry={retryPermission} />
     );
+
   if (!isCameraActive) return <IdleView />;
 
   return <ActiveVideoWrapper videoRef={videoRef} />;
