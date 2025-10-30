@@ -2,8 +2,6 @@
 
 import {
   Play,
-  Loader2,
-  AudioWaveform as AudioWaveformIcon,
   AudioLines,
 } from "lucide-react";
 import { PERMISSION_STATES } from "@/constants/chat";

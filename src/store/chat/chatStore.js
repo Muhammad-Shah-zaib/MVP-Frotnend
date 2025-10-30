@@ -6,6 +6,8 @@ import {
   AUDIO_PERMISSION_MESSAGES,
 } from "@/constants/chat";
 import { EMPTY_STRING } from "@/constants/general";
+import { uploadToServer } from "@/actions/elevenlabs";
+import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
 
 export const useChatStore = create((set, get) => ({
   cameraStream: null,
@@ -29,7 +31,7 @@ export const useChatStore = create((set, get) => ({
 
     try {
       let stream = null;
-      
+
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: "environment" } },
@@ -84,7 +86,7 @@ export const useChatStore = create((set, get) => ({
 
   toggleCamera: () => {
     const { isCameraActive, stopCamera, startCamera } = get();
-    
+
     if (isCameraActive) stopCamera();
     else startCamera();
   },
@@ -119,7 +121,10 @@ export const useChatStore = create((set, get) => ({
       else if (error.name === ERROR_NAMES.NOT_SUPPORTED)
         audioPermissionError = AUDIO_PERMISSION_MESSAGES.NOT_SUPPORTED;
 
-      set({ audioPermissionState: PERMISSION_STATES.DENIED, audioPermissionError });
+      set({
+        audioPermissionState: PERMISSION_STATES.DENIED,
+        audioPermissionError,
+      });
     }
   },
 
@@ -142,32 +147,36 @@ export const useChatStore = create((set, get) => ({
 
   toggleAudio: () => {
     const { isAudioActive, stopAudio, startAudio } = get();
-    
+
     if (isAudioActive) stopAudio();
     else startAudio();
   },
 
-  captureFrame: (videoElement) => {
+  captureFrame: (videoElement, opts) => {
     const { capturedImage, uploadedImage, showUploadInMain } = get();
-    
+
     if (capturedImage) {
       set({ capturedImage: null });
       return;
     }
 
-    if (!videoElement || !videoElement.videoWidth || !videoElement.videoHeight) {
+    if (
+      !videoElement ||
+      !videoElement.videoWidth ||
+      !videoElement.videoHeight
+    ) {
       return;
     }
 
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
-    
-    const ctx = canvas.getContext('2d');
+
+    const ctx = canvas.getContext("2d");
     ctx.drawImage(videoElement, 0, 0);
-    
-    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-    
+
+    const imageDataUrl = canvas.toDataURL("image/jpeg", 0.9);
+
     if (uploadedImage) {
       set({
         capturedImage: imageDataUrl,
@@ -177,6 +186,46 @@ export const useChatStore = create((set, get) => ({
       set({
         capturedImage: imageDataUrl,
       });
+    }
+
+    try {
+      const dataURLtoFile = (dataurl, filename) => {
+        const arr = dataurl.split(",");
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, { type: mime });
+      };
+
+      const file = dataURLtoFile(imageDataUrl, `capture_${Date.now()}.jpg`);
+      const conversationIdFromStore = useElevenLabsStore.getState
+        ? useElevenLabsStore.getState().conversationId
+        : null;
+      const userIdFromStore = useElevenLabsStore.getState
+        ? useElevenLabsStore.getState().userId
+        : null;
+
+      const conv =
+        (opts && opts.conversationId) ||
+        conversationIdFromStore ||
+        (typeof window !== "undefined" && window.LMA_CONVERSATION_ID) ||
+        null;
+      const uid =
+        (opts && opts.userId) ||
+        userIdFromStore ||
+        (typeof window !== "undefined" && window.LMA_USER_ID) ||
+        null;
+
+      uploadToServer(file, conv, uid).catch(() => {});
+    } catch (err) {
+      console.info(
+        "[Upload] failed to convert and upload captured image:",
+        err
+      );
     }
   },
 
@@ -203,7 +252,7 @@ export const useChatStore = create((set, get) => ({
 
   swapImageAndCamera: () => {
     const { showUploadInMain, capturedImage, uploadedImage } = get();
-    
+
     if (capturedImage && uploadedImage) {
       set({
         showCapturedInMain: !get().showCapturedInMain,
@@ -222,5 +271,5 @@ export const useChatStore = create((set, get) => ({
       showUploadInMain: false,
       showCapturedInMain: true,
     });
-  }
+  },
 }));
