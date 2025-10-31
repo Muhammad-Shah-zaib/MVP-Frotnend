@@ -8,7 +8,7 @@ async function ChatPage() {
         <ChatHeader />
       </div>
 
-      <div className="h-[90vh] w-full overflow-hidden">
+      <div className="h-[80vh] w-full overflow-hidden">
         <ChatComponent />
       </div>
     </div>

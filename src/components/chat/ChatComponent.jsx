@@ -1,12 +1,10 @@
 import MediaViewer from "./MediaViewer";
 import CameraActions from "./CameraActions";
-import VoiceConnectionStatus from "./VoiceConnectionStatus";
 import ImageBillboard from "../ImageBillboard";
 
 const ChatComponent = () => {
   return (
     <div className="w-full h-full relative">
-      <VoiceConnectionStatus />
       <ImageBillboard />
       <div className="flex flex-col w-full h-[78%] p-4 pt-0 pb-8">
         <MediaViewer />
