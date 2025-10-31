@@ -1,13 +1,14 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { AuthErrorContent } from "@/components/auth/auth-error/AuthErrorContent";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { AuthErrorContent } from "@/components/auth/auth-error/AuthErrorContent";
+import SpinnerOverlay from "@/shared/components/SpinnerOverlay";
 
-export default function AuthErrorPage() {
+function AuthErrorInner() {
   const searchParams = useSearchParams();
-  
   const error = searchParams.get("error") || "unknown_error";
   const errorCode = searchParams.get("error_code") || "unknown";
   const errorDescription = searchParams.get("error_description") || "An error occurred";
@@ -26,11 +27,19 @@ export default function AuthErrorPage() {
         </h1>
       </div>
 
-      <AuthErrorContent 
+      <AuthErrorContent
         error={error}
         errorCode={errorCode}
         errorDescription={errorDescription}
       />
     </div>
+  );
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense fallback={<SpinnerOverlay />}>
+      <AuthErrorInner />
+    </Suspense>
   );
 }

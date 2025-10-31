@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
 export const useImageBillboardStore = create((set) => ({
-    isOpen: true,
+    isOpen: false,
     setIsOpen: (value) => set({ isOpen: value }),
 }));
