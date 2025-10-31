@@ -1,15 +1,16 @@
 "use client";
 
-import {
-  Play,
-  AudioLines,
-} from "lucide-react";
 import { PERMISSION_STATES } from "@/constants/chat";
 import { useChatStore } from "@/store";
 import { useVoiceConversation } from "@/hooks/useVoiceConversation";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
 import AudioWaveform from "./AudioWaveform";
+// ICONS
+import StopIcon from "@/shared/icons/StopIcon";
+import PlayIcon from "@/shared/icons/PlayIcon";
+// STYLES
 import "./styles.css";
+
 
 const PlayButton = () => {
   const toggleCamera = useChatStore((state) => state.toggleCamera);
@@ -84,9 +85,9 @@ const PlayButton = () => {
               }}
             />
           ) : isCameraActive || isConnected ? (
-            <AudioLines style={{ width: '38px', height: '38px', color: '#a3b1c6' }} />
+            <StopIcon />
           ) : (
-            <Play style={{ width: '38px', height: '38px', color: '#a3b1c6' }} />
+            <PlayIcon />
           )}
         </div>
       </button>

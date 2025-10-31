@@ -6,6 +6,7 @@ import { useChatStore } from "@/store";
 import { uploadToServer } from "@/actions/elevenlabs";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
 import "./styles.css";
+import UploadIcon from "@/shared/icons/UploadIcon";
 
 const UploadButton = ({ userId }) => {
   const isCameraActive = useChatStore((state) => state.isCameraActive);
@@ -63,7 +64,7 @@ const UploadButton = ({ userId }) => {
             justifyContent: "center",
           }}
         >
-          <Image style={{ width: "28px", height: "28px", color: "#a3b1c6" }} />
+          <UploadIcon />
         </div>
       </button>
     </>

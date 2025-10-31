@@ -15,7 +15,7 @@ export default async function ProtectedLayout({ children }) {
 
   return (
     <div className="flex flex-col bg-gray-100 items-center w-full min-h-screen">
-      <div className="h-full w-[400px] sm:overflow-visible overflow-hidden">
+      <div className="h-full w-full max-w-[400px] sm:overflow-visible overflow-hidden">
         {children}
       </div>
     </div>

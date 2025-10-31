@@ -1,8 +1,8 @@
 const Camera = () => {
   return (
     <svg
-      width="32"
-      height="32"
+      width="25"
+      height="25"
       viewBox="0 -2 32 32"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"

@@ -9,7 +9,8 @@ export function GoogleSignInButton() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signInWithGoogleAction();
+      const origin = typeof window !== "undefined" ? window.location.origin : undefined
+      await signInWithGoogleAction(origin);
     } catch (error) {
       setIsLoading(false);
     }

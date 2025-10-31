@@ -1,13 +1,17 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { Menu, History, Settings, Phone, ChartBar, Text } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import Link from "next/link";
 
 function MenuButton() {
   const [open, setOpen] = useState(false);
-  
+
   const menuItems = [
     { icon: ChartBar, label: "Voice Chat", href: "/chat" },
     { icon: Text, label: "Text Chat", href: "/text-chat" },
@@ -23,8 +27,8 @@ function MenuButton() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="p-2 rounded-md hover:bg-gray-100 transition-colors">
-          <Menu className="w-8 h-8 text-primary" />
+        <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-200 hover:scale-95 transition-all duration-200">
+          <Menu className="w-7 h-7 text-gray-500" />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-48 p-2" align="start">
