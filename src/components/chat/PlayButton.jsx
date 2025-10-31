@@ -42,12 +42,10 @@ const PlayButton = () => {
       
       await startConversation();
     } else {
+      if (isAudioActive) toggleAudio();
+      if (isCameraActive) toggleCamera();
+
       await endConversation();
-      
-      toggleAudio();
-      setTimeout(() => {
-        toggleCamera();
-      }, 100);
     }
   };
 
