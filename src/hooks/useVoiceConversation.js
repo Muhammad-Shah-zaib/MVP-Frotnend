@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useChatStore } from "@/store";
+import { useCallback } from "react";
 import { useImageBillboardStore } from "@/store/imageBillboard/imageBillboardStore";
 import { useConversation } from "@elevenlabs/react";
-import { getElevenLabsSignedUrl } from "@/actions/elevenlabs";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
 
 export const useVoiceConversation = () => {
@@ -16,10 +16,11 @@ export const useVoiceConversation = () => {
     setError,
     setConversationId,
     setSpeaking,
-    reset
+    reset,
   } = useElevenLabsStore();
 
-  const { setIsOpen } = useImageBillboardStore();
+  const { setImagePath } = useImageBillboardStore();
+  const { stopCamera, clearImages } = useChatStore();
 
   const conversation = useConversation({
     onConnect: () => {
@@ -30,6 +31,8 @@ export const useVoiceConversation = () => {
     },
     onDisconnect: () => {
       console.log("Disconnected from ElevenLabs");
+      stopCamera();
+      clearImages();
       reset();
     },
     onError: (error) => {
@@ -45,10 +48,11 @@ export const useVoiceConversation = () => {
       setSpeaking(mode.mode === "speaking");
     },
     clientTools: {
-      showImageOnScreen: async () => {
-        setIsOpen(true);
+      showImageOnScreen: async ({ imagePath }) => {
+        console.log("imagePath: " + imagePath);
+        setImagePath(imagePath);
       },
-    }
+    },
   });
 
   const startConversation = useCallback(async () => {
@@ -56,7 +60,8 @@ export const useVoiceConversation = () => {
       setConnecting(true);
       setError(null);
 
-      const result = await getElevenLabsSignedUrl();
+      const response = await fetch("/api/elevenlabs-signed-url");
+      const result = await response.json();
 
       if (!result.success) {
         throw new Error(result.error);
@@ -64,7 +69,7 @@ export const useVoiceConversation = () => {
 
       const returnedConversationId = await conversation.startSession({
         signedUrl: result.signedUrl,
-        connectionType: 'websocket'
+        connectionType: "websocket",
       });
 
       setConversationId(returnedConversationId || result.agentId);
@@ -91,6 +96,6 @@ export const useVoiceConversation = () => {
     error,
     startConversation,
     endConversation,
-    status: conversation.status
+    status: conversation.status,
   };
 };

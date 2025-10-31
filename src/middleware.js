@@ -8,8 +8,6 @@ export async function middleware(request) {
     data: { user },
   } = await client.auth.getUser();
 
-  console.warn("Middleware - User:", user);
-
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/chat");
 
   /*

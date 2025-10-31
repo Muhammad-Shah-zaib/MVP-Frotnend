@@ -1,39 +1,41 @@
 "use client";
 
 import { useChatStore } from "@/store";
+import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
 import Camera from "@/shared/icons/Camera";
 import "./styles.css";
 
-const CameraButton = () => {
+const CameraButton = ({ userId }) => {
   const isCameraActive = useChatStore((state) => state.isCameraActive);
   const capturedImage = useChatStore((state) => state.capturedImage);
   const uploadedImage = useChatStore((state) => state.uploadedImage);
   const captureFrame = useChatStore((state) => state.captureFrame);
+  const conversationId = useElevenLabsStore((state) => state.conversationId);
 
   const handleClick = () => {
     if (capturedImage) {
       captureFrame(null);
     } else if (isCameraActive) {
-      const videoElements = document.querySelectorAll('video');
-      let targetVideo = Array.from(videoElements).find(video => 
-        !video.closest('.camera-overlay')
+      const videoElements = document.querySelectorAll("video");
+      let targetVideo = Array.from(videoElements).find(
+        (video) => !video.closest(".camera-overlay")
       );
-      
+
       if (!targetVideo) {
-        targetVideo = Array.from(videoElements).find(video => 
-          video.closest('.camera-overlay')
+        targetVideo = Array.from(videoElements).find((video) =>
+          video.closest(".camera-overlay")
         );
       }
-      
+
       if (targetVideo) {
-        captureFrame(targetVideo);
+        captureFrame(targetVideo, { conversationId, userId });
       }
     }
   };
 
   const shouldShow = isCameraActive || capturedImage || uploadedImage;
   const isImageCaptured = !!capturedImage;
-  
+
   if (!shouldShow) return null;
 
   return (
@@ -55,13 +57,13 @@ const CameraButton = () => {
           justifyContent: "center",
         }}
       >
-        <Camera 
-          style={{ 
-            width: "28px", 
-            height: "28px", 
+        <Camera
+          style={{
+            width: "28px",
+            height: "28px",
             color: isImageCaptured ? "#3b82f6" : "#a3b1c6",
-            transition: "color 0.3s ease"
-          }} 
+            transition: "color 0.3s ease",
+          }}
         />
       </div>
     </button>
