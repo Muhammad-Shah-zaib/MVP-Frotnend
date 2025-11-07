@@ -4,7 +4,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export async function getElevenLabsSignedUrl() {
   try {
-    const url = `${BACKEND_URL}/api/elevenlabs/get-signed-url`;
+    const url = `${BACKEND_URL}/api/v1/elevenlabs/get-signed-url`;
     console.log("Fetching ElevenLabs signed URL from:", url);
     const response = await fetch(url, {
       method: "GET",

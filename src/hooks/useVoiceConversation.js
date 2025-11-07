@@ -47,11 +47,17 @@ export const useVoiceConversation = () => {
       console.log("Mode changed:", mode);
       setSpeaking(mode.mode === "speaking");
     },
-    clientTools: {
+    clientTools: {     
+      logMessage: async ({ message }) => {
+        console.log(message);
+      },
       showImageOnScreen: async ({ imagePath }) => {
         console.log("imagePath: " + imagePath);
         setImagePath(imagePath);
       },
+      pointObjectInImage: async ({ query }) => {
+        console.log('🔍 pointObjectInImage called with query:', query);
+      }
     },
   });
 
