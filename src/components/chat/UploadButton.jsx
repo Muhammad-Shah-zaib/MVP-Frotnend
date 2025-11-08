@@ -1,6 +1,5 @@
 "use client";
 
-import { Image } from "lucide-react";
 import { useRef } from "react";
 import { useChatStore } from "@/store";
 import { uploadToServer } from "@/actions/elevenlabs";

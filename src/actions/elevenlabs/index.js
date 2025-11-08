@@ -44,8 +44,8 @@ export const uploadToServer = async (file, conversationId, userId) => {
   console.info("[Upload] uploading image to server", file);
   try {
     const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5005";
-    const url = `${backendUrl.replace(/\/$/, "")}/upload_image`;
+      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+    const url = `${backendUrl.replace(/\/$/, "")}/api/v1/images/upload`;
     const fd = new FormData();
     fd.append("image", file);
 

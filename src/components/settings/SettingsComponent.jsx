@@ -19,7 +19,7 @@ const SettingsComponent = async () => {
   }
 
   return (
-    <section id="settings-ctn" className="h-full w-full p-4 space-y-4">
+    <section id="settings-ctn" className="h-[90vh] w-full p-4 space-y-4">
       {/* header */}
       <div className="flex items-center gap-4 text-gray-700 ">
         <BackButton />

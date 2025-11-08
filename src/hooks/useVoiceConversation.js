@@ -47,7 +47,7 @@ export const useVoiceConversation = () => {
       console.log("Mode changed:", mode);
       setSpeaking(mode.mode === "speaking");
     },
-    clientTools: {     
+    clientTools: {
       logMessage: async ({ message }) => {
         console.log(message);
       },
@@ -56,8 +56,8 @@ export const useVoiceConversation = () => {
         setImagePath(imagePath);
       },
       pointObjectInImage: async ({ query }) => {
-        console.log('🔍 pointObjectInImage called with query:', query);
-      }
+        console.log("🔍 pointObjectInImage called with query:", query);
+      },
     },
   });
 
@@ -73,10 +73,21 @@ export const useVoiceConversation = () => {
         throw new Error(result.error);
       }
 
+      const chatId = "TESTING_CHAT_ID_123";
+      const userId = "TESTING_USER_ID_456";
+
       const returnedConversationId = await conversation.startSession({
         signedUrl: result.signedUrl,
         connectionType: "websocket",
+        customLlmExtraBody: {
+          chatId,
+          userId,
+        },
       });
+
+      console.log("Conversation started with ID:", returnedConversationId);
+      console.log("Chat ID:", chatId);
+      console.log("User ID:", userId);
 
       setConversationId(returnedConversationId || result.agentId);
     } catch (error) {
