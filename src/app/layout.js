@@ -21,15 +21,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-[100dvh] overflow-hidden`}
       >
         {/* Desktop/Tablet Warning - Hidden on mobile */}
-        <div className="block sm:hidden">
+        <div className="block sm:hidden h-[100dvh] overflow-hidden">
           {children}
         </div>
         
         {/* Show message on tablets and desktops */}
-        <div className="hidden sm:block">
+        <div className="hidden sm:block h-[100dvh] overflow-hidden">
           <DesktopMessage />
         </div>
       </body>

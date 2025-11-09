@@ -7,7 +7,9 @@ import {
 } from "@/constants/chat";
 import { EMPTY_STRING } from "@/constants/general";
 import { uploadToServer } from "@/actions/elevenlabs";
-import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
+import { useElevenLabsStore } from "@/store";
+import { supabaseBrowser } from "@/lib/Supabase/client";
+import { generateSessionUserId, generateGlobalUserId } from "@/utils/memoryUtils";
 
 export const useChatStore = create((set, get) => ({
   cameraStream: null,
@@ -22,6 +24,11 @@ export const useChatStore = create((set, get) => ({
   uploadedImage: null,
   showUploadInMain: false,
   showCapturedInMain: true,
+  isAutoCapturing: false,
+  autoCaptureInterval: 1000,
+  similarityThreshold: 10,
+  lastImageHash: null,
+  lastCaptureTime: 0,
 
   startCamera: async () => {
     set({
@@ -77,6 +84,9 @@ export const useChatStore = create((set, get) => ({
       capturedImage: null,
       uploadedImage: null,
       showUploadInMain: false,
+      isAutoCapturing: false,
+      lastImageHash: null,
+      lastCaptureTime: 0,
     });
   },
 
@@ -270,6 +280,186 @@ export const useChatStore = create((set, get) => ({
       uploadedImage: null,
       showUploadInMain: false,
       showCapturedInMain: true,
+      lastImageHash: null,
+      lastCaptureTime: 0,
     });
   },
+
+  toggleAutoCapture: () => {
+    set({ isAutoCapturing: !get().isAutoCapturing });
+  },
+
+  setAutoCapturing: (isAutoCapturing) => {
+    set({ isAutoCapturing });
+  },
+
+  setLastImageHash: (hash) => {
+    set({ lastImageHash: hash });
+  },
+
+  setLastCaptureTime: (time) => {
+    set({ lastCaptureTime: time });
+  },
+
+  getImageData: (videoElement) => {
+    if (
+      !videoElement ||
+      !videoElement.videoWidth ||
+      !videoElement.videoHeight
+    ) {
+      return null;
+    }
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const width = 64;
+    const height = Math.floor(
+      videoElement.videoHeight * (width / videoElement.videoWidth)
+    );
+    const validHeight = Math.max(1, height);
+
+    canvas.width = width;
+    canvas.height = validHeight;
+
+    ctx.drawImage(videoElement, 0, 0, width, validHeight);
+    return ctx.getImageData(0, 0, width, validHeight);
+  },
+
+  calculateImageHash: (imageData) => {
+    if (!imageData) return null;
+
+    try {
+      const { data, width, height } = imageData;
+
+      if (!data || !width || !height || width <= 0 || height <= 0) {
+        return null;
+      }
+
+      const grayscale = [];
+      for (let i = 0; i < data.length; i += 4) {
+        const gray =
+          0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+        grayscale.push(gray);
+      }
+
+      const totalPixels = width * height;
+      const average =
+        grayscale.reduce((sum, val) => sum + val, 0) / totalPixels;
+
+      let hash = "";
+      for (let i = 0; i < grayscale.length; i++) {
+        hash += grayscale[i] >= average ? "1" : "0";
+      }
+
+      return hash;
+    } catch (err) {
+      return null;
+    }
+  },
+
+  calculateSimilarity: (hash1, hash2) => {
+    if (!hash1 || !hash2) return 100;
+    if (hash1.length !== hash2.length) return 100;
+
+    let differences = 0;
+    for (let i = 0; i < hash1.length; i++) {
+      if (hash1[i] !== hash2[i]) {
+        differences++;
+      }
+    }
+
+    return (differences / hash1.length) * 100;
+  },
+
+  fetchUserMemories: async (chat_id, user_id) => {
+    try {
+      console.log("[Memory Fetch] Fetching memories for:", {
+        chat_id,
+        user_id,
+      });
+
+      const sessionUserId = generateSessionUserId(user_id);
+      const globalUserId = generateGlobalUserId(user_id);
+
+      console.log("[Memory Fetch] Generated user IDs:", {
+        sessionUserId,
+        globalUserId,
+      });
+
+      const { data: sessionMemories, error: sessionError } =
+        await supabaseBrowser
+          .rpc("get_session_memories", {
+            p_user_id: sessionUserId,
+            p_chat_session_id: chat_id,
+          });
+
+      if (sessionError) {
+        console.error(
+          "[Memory Fetch] Error fetching session memories:",
+          sessionError
+        );
+      }
+
+      const { data: globalMemories, error: globalError } = await supabaseBrowser
+        .rpc("get_global_memories", {
+          p_user_id: globalUserId,
+        });
+
+      if (globalError) {
+        console.error(
+          "[Memory Fetch] Error fetching global memories:",
+          globalError
+        );
+      }
+
+      console.group("[Memory Fetch Results]");
+      console.log("Session Memories:", sessionMemories || []);
+      console.log("Global Memories:", globalMemories || []);
+      console.groupEnd();
+
+      return {
+        session: sessionMemories || [],
+        global: globalMemories || [],
+      };
+    } catch (err) {
+      console.error("[Memory Fetch] Unexpected error:", err);
+      return { session: [], global: [] };
+    }
+  },
+
+  createAndSetChatSession: async (userId) => {
+    try {
+      const { createChatSession } = await import("@/actions/chat/create-session");
+      
+      const result = await createChatSession(userId);
+      
+      if (result.success) {
+        const setChatId = useElevenLabsStore.getState().setChatId;
+        setChatId(result.sessionId);
+        
+        console.log("[Chat Store] Chat session created:", result.sessionId);
+        return result.sessionId;
+      } else {
+        console.error("[Chat Store] Failed to create chat session:", result.error);
+        return null;
+      }
+    } catch (err) {
+      console.error("[Chat Store] Error creating chat session:", err);
+      return null;
+    }
+  },
 }));
+
+// INTERFACE DEFINITIONS FOR REFERENCE ONLY
+
+// CHAT chat_sessions TABLE IN SUPABASE
+
+// interface ChatSession {
+//   id: string;                 // UUID, unique session id
+//   user_id: string;            // UUID, owner of the session
+//   title: string;              // text, user-given title for the session
+//   cover_image?: string | null; // text, optional public URL for session cover image
+//   metadata: Record<string, any>; // JSONB, additional session-level info
+//   created_at: string;         // timestamp with timezone, session creation
+//   updated_at: string;         // timestamp with timezone, last update
+// }

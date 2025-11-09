@@ -39,6 +39,8 @@ export async function signUpAction(prevState, formData) {
       values: {
         fullname,
         email,
+        password,
+        confirmPassword,
       }
     };
   }
@@ -63,6 +65,8 @@ export async function signUpAction(prevState, formData) {
       values: {
         fullname,
         email,
+        password,
+        confirmPassword,
       }
     };
   }
@@ -74,6 +78,8 @@ export async function signUpAction(prevState, formData) {
       values: {
         fullname,
         email,
+        password,
+        confirmPassword,
       }
     };
   }

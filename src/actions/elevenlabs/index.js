@@ -57,13 +57,21 @@ export const uploadToServer = async (file, conversationId, userId) => {
       console.warn(
         "[Upload] No conversation_id available for upload; the server expects conversation_id in form-data"
       );
+      return null;
     } else {
       fd.append("conversation_id", conv);
     }
 
     const uid =
       userId || (typeof window !== "undefined" && window.LMA_USER_ID) || null;
-    if (uid) fd.append("user_id", uid);
+    if (!uid) {
+      console.warn(
+        "[Upload] No user_id available for upload; the server expects user_id in form-data"
+      );
+      return null;
+    } else {
+      fd.append("user_id", uid);
+    }
 
     const resp = await fetch(url, {
       method: "POST",

@@ -2,15 +2,17 @@
 
 import { useChatStore } from "@/store";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
+import { useUserStore } from "@/store/user/userStore";
 import Camera from "@/shared/icons/Camera";
 import "./styles.css";
 
-const CameraButton = ({ userId }) => {
+const CameraButton = ({ userId: propUserId }) => {
   const isCameraActive = useChatStore((state) => state.isCameraActive);
   const capturedImage = useChatStore((state) => state.capturedImage);
   const uploadedImage = useChatStore((state) => state.uploadedImage);
   const captureFrame = useChatStore((state) => state.captureFrame);
-  const conversationId = useElevenLabsStore((state) => state.conversationId);
+  const { chatId } = useElevenLabsStore();
+  const storeUserId = useUserStore((state) => state.userId);
 
   const handleClick = () => {
     if (capturedImage) {
@@ -28,7 +30,7 @@ const CameraButton = ({ userId }) => {
       }
 
       if (targetVideo) {
-        captureFrame(targetVideo, { conversationId, userId });
+        captureFrame(targetVideo, { conversationId: chatId, userId: propUserId || storeUserId });
       }
     }
   };

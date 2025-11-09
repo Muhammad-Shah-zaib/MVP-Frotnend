@@ -5,6 +5,7 @@ export const useElevenLabsStore = create((set) => ({
   isConnecting: false,
   error: null,
   conversationId: null,
+  chatId: null,
   isMuted: false,
   isSpeaking: false,
   
@@ -12,6 +13,7 @@ export const useElevenLabsStore = create((set) => ({
   setConnecting: (connecting) => set({ isConnecting: connecting }),
   setError: (error) => set({ error }),
   setConversationId: (id) => set({ conversationId: id }),
+  setChatId: (id) => set({ chatId: id }),
   setMuted: (muted) => set({ isMuted: muted }),
   setSpeaking: (speaking) => set({ isSpeaking: speaking }),
   
@@ -20,6 +22,7 @@ export const useElevenLabsStore = create((set) => ({
     isConnecting: false,
     error: null,
     conversationId: null,
+    // chatId stays persistent - don't reset it
     isMuted: false,
     isSpeaking: false
   })

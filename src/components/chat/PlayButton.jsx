@@ -22,6 +22,7 @@ const PlayButton = () => {
     (state) => state.audioPermissionState
   );
   const clearImages = useChatStore((state) => state.clearImages);
+  const setAutoCapturing = useChatStore((state) => state.setAutoCapturing);
 
   const { startConversation, endConversation, isConnecting } = useVoiceConversation();
   const isConnected = useElevenLabsStore((state) => state.isConnected);
@@ -42,11 +43,13 @@ const PlayButton = () => {
       }, 200);
       
       await startConversation();
+      setAutoCapturing(true);
     } else {
       if (isAudioActive) toggleAudio();
       if (isCameraActive) toggleCamera();
 
       await endConversation();
+      setAutoCapturing(false);
     }
   };
 

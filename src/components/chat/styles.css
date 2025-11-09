@@ -142,8 +142,7 @@
 /* Green pulsating ring around start button when it should be clicked */
 .start-button.should-click {
   position: relative;
-  animation: greenPulseGlow 1s infinite ease-in-out !important;
-  box-shadow: 0 0 8px 4px rgba(76, 175, 80, 0.5) !important;
+  animation: greenPulseGlow 1.5s infinite ease-in-out ;
 }
 
 .start-button.should-click::before {
@@ -160,10 +159,10 @@
 
 @keyframes greenPulseGlow {
   0%, 100% {
-    box-shadow: 0 0 8px 4px rgba(76, 175, 80, 0.5) !important;
+    box-shadow: 0 0 4.5px 1.5px rgba(76, 175, 80, 0.4);
   }
   50% {
-    box-shadow: 0 0 15px 6px rgba(76, 175, 80, 0.8) !important;
+    box-shadow: 0 0 15px 4px rgba(76, 175, 80, 0.6);
   }
 }
 

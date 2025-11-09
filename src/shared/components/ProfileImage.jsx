@@ -25,7 +25,7 @@ const ProfileImage = ({ profile_image, full_name, email }) => {
         )}
       </div>
       <div className="flex flex-col">
-        <h3 className="text-2xl font-bold text-gray-800">{full_name || email || "User"}</h3>
+        <h3 className="text-3xl text-gray-800">{full_name || email || "User"}</h3>
       </div>
     </div>
   );

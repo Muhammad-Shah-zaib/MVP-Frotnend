@@ -3,12 +3,12 @@ import ChatHeader from "@/components/chat/header";
 
 async function ChatPage() {
   return (
-    <div className="w-full h-full px-2">
-      <div className="max-w-[400px] w-full">
+     <div className="w-full h-full px-2 flex flex-col overflow-hidden">
+      <div className="max-w-[400px] w-full flex-shrink-0">
         <ChatHeader />
       </div>
 
-      <div className="h-[80vh] w-full overflow-hidden">
+      <div className="flex-1 w-full overflow-hidden">
         <ChatComponent />
       </div>
     </div>

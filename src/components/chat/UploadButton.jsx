@@ -4,15 +4,17 @@ import { useRef } from "react";
 import { useChatStore } from "@/store";
 import { uploadToServer } from "@/actions/elevenlabs";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
+import { useUserStore } from "@/store/user/userStore";
 import "./styles.css";
 import UploadIcon from "@/shared/icons/UploadIcon";
 
-const UploadButton = ({ userId }) => {
+const UploadButton = ({ userId: propUserId }) => {
   const isCameraActive = useChatStore((state) => state.isCameraActive);
   const capturedImage = useChatStore((state) => state.capturedImage);
   const uploadedImage = useChatStore((state) => state.uploadedImage);
   const uploadImage = useChatStore((state) => state.uploadImage);
-  const { conversationId } = useElevenLabsStore();
+  const { chatId } = useElevenLabsStore();
+  const storeUserId = useUserStore((state) => state.userId);
   const fileInputRef = useRef(null);
 
   const handleFileChange = async (event) => {
@@ -21,7 +23,7 @@ const UploadButton = ({ userId }) => {
       if (isCameraActive) {
         uploadImage(file);
         // also send to backend (silent)
-        await uploadToServer(file, conversationId, userId);
+        await uploadToServer(file, chatId, propUserId || storeUserId);
       }
     }
     if (fileInputRef.current) {

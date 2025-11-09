@@ -30,7 +30,8 @@ export const DeniedView = ({ permissionError, onRetry }) => (
 export const IdleView = () => (
   <div className="w-full h-full flex flex-col items-center justify-center rounded-3xl bg-primary/20">
     <CameraIcon className="w-16 h-16 text-gray-400 mb-4" />
-    <p className="text-gray-500">Click the play button to start camera</p>
+    <p className="text-gray-600 font-medium text-lg">Ready to start?</p>
+    <p className="text-gray-500 text-sm mt-2">Click the play button below</p>
   </div>
 );
 
