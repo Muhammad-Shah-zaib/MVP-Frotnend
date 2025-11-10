@@ -42,7 +42,7 @@ const CameraButton = ({ userId: propUserId }) => {
 
   return (
     <button
-      className="neumorphic-button btn-round camera-button"
+      className={`neumorphic-button btn-round camera-button ${isImageCaptured ? "active" : ""}`}
       style={{
         width: "55px",
         height: "55px",

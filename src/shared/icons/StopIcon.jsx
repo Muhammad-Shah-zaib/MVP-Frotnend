@@ -4,8 +4,8 @@ const StopIcon = () => {
   return (
     <svg
       className="start-icon"
-      width="38"
-      height="38"
+      width="30"
+      height="30"
       viewBox="0 0 31.668 31.668"
       fill="#a3b1c6"
     >

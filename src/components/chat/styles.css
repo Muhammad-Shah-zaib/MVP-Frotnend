@@ -21,22 +21,6 @@
   outline: none;
 }
 
-.neumorphic-button:focus:not(:hover) {
-  box-shadow: 
-    0.1875rem 0.1875rem 0.375rem rgba(163, 177, 198, 0.6),
-    -0.1875rem -0.1875rem 0.375rem rgba(255, 255, 255, 0.9),
-    inset 0 0 0 rgba(163, 177, 198, 0),
-    inset 0 0 0 rgba(255, 255, 255, 0) !important;
-  transform: scale(1) !important;
-}
-
-.neumorphic-button:hover:not(:active):not(.active) {
-  background-color: #e0e4ea !important;
-  transform: scale(0.98);
-  box-shadow: 
-    inset 0.1875rem 0.1875rem 0.3125rem rgba(163, 177, 198, 0.6),
-    inset -0.1875rem -0.1875rem 0.3125rem rgba(255, 255, 255, 0.9);
-}
 
 .neumorphic-button:active {
   transform: scale(0.95);
@@ -67,11 +51,6 @@
 .camera-button svg path,
 .camera-button svg {
   color: #a3b1c6;
-}
-
-.camera-button.active svg path,
-.camera-button.active svg {
-  color: #4CAF50;
 }
 
 /* Start/Play Button Specific */

@@ -371,6 +371,24 @@ export const useChatStore = create((set, get) => ({
     return (differences / hash1.length) * 100;
   },
 
+  getCurrentMainImage: () => {
+    const { capturedImage, uploadedImage, showUploadInMain, showCapturedInMain } = get();
+    
+    if (capturedImage && uploadedImage) {
+      return showCapturedInMain ? capturedImage : uploadedImage;
+    }
+    
+    if (capturedImage) {
+      return capturedImage;
+    }
+    
+    if (uploadedImage) {
+      return uploadedImage;
+    }
+    
+    return null;
+  },
+
   fetchUserMemories: async (chat_id, user_id) => {
     try {
       console.log("[Memory Fetch] Fetching memories for:", {

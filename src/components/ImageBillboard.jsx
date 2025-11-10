@@ -3,14 +3,16 @@
 import { useRef, useState, useEffect } from "react";
 import { useImageBillboardStore } from "@/store/imageBillboard/imageBillboardStore";
 import { getArtworkInfo, formatArtistName } from "@/utils/artworkInfo";
+import CoordinateHighlighter from "./CoordinateHighlighter";
 
 export default function ImageBillboard() {
-  const { isOpen, setIsOpen, imagePath } = useImageBillboardStore();
+  const { isOpen, setIsOpen, imagePath, highlightedCoordinates } = useImageBillboardStore();
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [hasImageError, setHasImageError] = useState(false);
   const imageRef = useRef(null);
+  const containerRef = useRef(null);
 
   const artworkInfo = getArtworkInfo(imagePath);
   const artistName = formatArtistName(artworkInfo);
@@ -82,30 +84,39 @@ export default function ImageBillboard() {
           </button>
         </div>
         
-        {/* Content */}
-        <div className="flex-1 flex items-center justify-center p-3 bg-[#dde3ed] min-h-[200px] relative">
+        <div 
+          ref={containerRef}
+          className="flex-1 flex items-center justify-center p-3 bg-[#dde3ed] min-h-[200px] relative"
+        >
           {isImageLoading && !hasImageError && (
             <div className="text-[#666] text-base text-center p-8">Loading image...</div>
           )}
           {imagePath && (
-            <img 
-              ref={imageRef}
-              src={imageUrl}
-              alt="Gallery artwork"
-              className={`max-w-full w-full h-auto object-contain rounded-xl transition-transform duration-200 hover:scale-[1.02] ${
-                isImageLoading && !hasImageError ? 'hidden' : 'block'
-              }`}
-              style={{
-                boxShadow: '0.3125rem 0.3125rem 0.625rem rgba(163, 177, 198, 0.6), -0.3125rem -0.3125rem 0.625rem rgba(255, 255, 255, 0.8)'
-              }}
-              onLoad={() => setIsImageLoading(false)}
-              onError={(e) => {
-                console.error('Failed to load image:', imageUrl);
-                setIsImageLoading(false);
-                setHasImageError(true);
-                e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlM2VkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
-              }}
-            />
+            <>
+              <img 
+                ref={imageRef}
+                src={imageUrl}
+                alt="Gallery artwork"
+                className={`max-w-full w-full h-auto object-contain rounded-xl transition-transform duration-200 hover:scale-[1.02] ${
+                  isImageLoading && !hasImageError ? 'hidden' : 'block'
+                }`}
+                style={{
+                  boxShadow: '0.3125rem 0.3125rem 0.625rem rgba(163, 177, 198, 0.6), -0.3125rem -0.3125rem 0.625rem rgba(255, 255, 255, 0.8)'
+                }}
+                onLoad={() => setIsImageLoading(false)}
+                onError={(e) => {
+                  console.error('Failed to load image:', imageUrl);
+                  setIsImageLoading(false);
+                  setHasImageError(true);
+                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlM2VkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+                }}
+              />
+              <CoordinateHighlighter 
+                points={highlightedCoordinates} 
+                imageRef={imageRef} 
+                containerRef={containerRef} 
+              />
+            </>
           )}
         </div>
       </div>

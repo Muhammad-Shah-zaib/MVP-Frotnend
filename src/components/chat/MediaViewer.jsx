@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useChatStore } from "@/store";
 import { useElevenLabsStore } from "@/store";
 import { useUserStore } from "@/store/user/userStore";
+import { useImageBillboardStore } from "@/store/imageBillboard/imageBillboardStore";
 import {
   RequestingView,
   DeniedView,
@@ -17,11 +18,14 @@ import { uploadToServer } from "@/actions/elevenlabs";
 
 const MediaViewer = () => {
   const videoRef = useRef(null);
+  const imageRef = useRef(null);
+  const containerRef = useRef(null);
   const autoCaptureTimerRef = useRef(null);
   const hashResetTimeoutRef = useRef(null);
 
   const { isSpeaking, isConnected, chatId } = useElevenLabsStore();
   const userId = useUserStore((state) => state.userId);
+  const { highlightedCoordinates } = useImageBillboardStore();
 
   const {
     cameraStream,
@@ -230,10 +234,17 @@ const MediaViewer = () => {
   if (capturedImage && uploadedImage) {
     const mainImage = showCapturedInMain ? capturedImage : uploadedImage;
     const overlayImage = showCapturedInMain ? uploadedImage : capturedImage;
+    const isMainFromCamera = showCapturedInMain;
 
     return (
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
-        <ImageView imageSrc={mainImage} />
+        <ImageView 
+          imageSrc={mainImage} 
+          highlightedCoordinates={highlightedCoordinates}
+          imageRef={imageRef}
+          containerRef={containerRef}
+          isFromCamera={isMainFromCamera}
+        />
         <div
           className="camera-overlay"
           onClick={swapImageAndCamera}
@@ -265,12 +276,24 @@ const MediaViewer = () => {
     );
   }
 
-  if (capturedImage) return <ImageView imageSrc={capturedImage} />;
+  if (capturedImage) return <ImageView 
+    imageSrc={capturedImage} 
+    highlightedCoordinates={highlightedCoordinates}
+    imageRef={imageRef}
+    containerRef={containerRef}
+    isFromCamera={true}
+  />;
 
   if (uploadedImage && showUploadInMain)
     return (
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
-        <ImageView imageSrc={uploadedImage} />
+        <ImageView 
+          imageSrc={uploadedImage} 
+          highlightedCoordinates={highlightedCoordinates}
+          imageRef={imageRef}
+          containerRef={containerRef}
+          isFromCamera={false}
+        />
         <CameraOverlay />
       </div>
     );

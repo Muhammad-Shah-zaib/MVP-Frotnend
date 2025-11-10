@@ -1,4 +1,5 @@
 import { Camera as CameraIcon, AlertCircle } from "lucide-react";
+import CoordinateHighlighter from "../CoordinateHighlighter";
 
 export const RequestingView = () => (
   <div className="w-full h-full flex flex-col items-center justify-center rounded-3xl bg-primary/20">
@@ -49,12 +50,39 @@ export const ActiveVideoWrapper = ({ videoRef }) => {
   );
 };
 
-export const ImageView = ({ imageSrc }) => (
-  <div className="w-full h-full flex items-center justify-center rounded-3xl bg-primary/20 overflow-hidden">
+export const ImageView = ({ imageSrc, highlightedCoordinates = [], imageRef, containerRef, isFromCamera = false }) => (
+  <div 
+    ref={containerRef}
+    className="w-full h-full flex items-center justify-center rounded-3xl overflow-hidden relative"
+    style={{ 
+      backgroundColor: '#dde3ed',
+      position: 'relative'
+    }}
+  >
     <img
+      ref={imageRef}
       src={imageSrc}
       alt="Captured or uploaded"
-      className="w-full h-full object-cover rounded-3xl"
+      className={`rounded-3xl ${isFromCamera ? 'w-full h-full object-cover' : 'max-w-full max-h-full object-contain'}`}
+      style={isFromCamera ? {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover'
+      } : {
+        width: 'auto',
+        height: 'auto',
+        maxWidth: '100%',
+        maxHeight: '100%',
+        objectFit: 'contain'
+      }}
     />
+    {highlightedCoordinates && highlightedCoordinates.length > 0 && (
+      <CoordinateHighlighter 
+        points={highlightedCoordinates} 
+        imageRef={imageRef} 
+        containerRef={containerRef}
+        isObjectCover={isFromCamera}
+      />
+    )}
   </div>
 );

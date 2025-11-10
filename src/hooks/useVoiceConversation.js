@@ -1,7 +1,7 @@
 "use client";
 
 import { useChatStore } from "@/store";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useImageBillboardStore } from "@/store/imageBillboard/imageBillboardStore";
 import { useConversation } from "@elevenlabs/react";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
@@ -55,14 +55,17 @@ export const useVoiceConversation = () => {
 
   const userId = useUserStore((state) => state.userId);
 
-  const { setImagePath } = useImageBillboardStore();
+  const { setImagePath, setHighlightedCoordinates } = useImageBillboardStore();
   const { 
     stopCamera, 
     clearImages, 
     setAutoCapturing, 
     fetchUserMemories,
-    createAndSetChatSession 
+    createAndSetChatSession,
+    getCurrentMainImage
   } = useChatStore();
+
+  const highlightTimeoutRef = useRef(null);
 
   const conversation = useConversation({
     onConnect: () => {
@@ -101,6 +104,130 @@ export const useVoiceConversation = () => {
       },
       pointObjectInImage: async ({ query }) => {
         console.log("🔍 pointObjectInImage called with query:", query);
+        
+        try {
+          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+          const conversationIdFromStore = useElevenLabsStore.getState?.()?.conversationId;
+          const chatIdFromStore = useElevenLabsStore.getState?.()?.chatId;
+          
+          let filename = null;
+          const imageToUse = getCurrentMainImage();
+          
+          if (!imageToUse) {
+            console.warn("🔍 No image available for point detection");
+            return {
+              status: "error",
+              message: "No image available. Please upload or capture an image first."
+            };
+          }
+
+          console.log("🔍 Current main image type:", typeof imageToUse, imageToUse.substring?.(0, 50));
+
+          if (typeof imageToUse === 'string' && imageToUse.startsWith('data:')) {
+            console.log("🔍 Image is a data URL, converting to blob and uploading...");
+            const blob = await fetch(imageToUse).then(r => r.blob());
+            const file = new File([blob], `point-detection-${Date.now()}.jpg`, { type: 'image/jpeg' });
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('conversation_id', chatIdFromStore || conversationIdFromStore || 'temp');
+            formData.append('user_id', userId || 'anonymous');
+            
+            const uploadResponse = await fetch(`${backendUrl}/api/v1/images/upload`, {
+              method: 'POST',
+              body: formData
+            });
+            
+            if (!uploadResponse.ok) {
+              throw new Error(`Upload failed: ${uploadResponse.status}`);
+            }
+            
+            const uploadData = await uploadResponse.json();
+            filename = uploadData.filename || uploadData.public_image_url?.split('/').pop();
+            console.log("🔍 Data URL uploaded, filename:", filename);
+          } else if (imageToUse instanceof File) {
+            console.log("🔍 Image is a File object, uploading...");
+            const formData = new FormData();
+            formData.append('image', imageToUse);
+            formData.append('conversation_id', chatIdFromStore || conversationIdFromStore || 'temp');
+            formData.append('user_id', userId || 'anonymous');
+            
+            const uploadResponse = await fetch(`${backendUrl}/api/v1/images/upload`, {
+              method: 'POST',
+              body: formData
+            });
+            
+            if (!uploadResponse.ok) {
+              throw new Error(`Upload failed: ${uploadResponse.status}`);
+            }
+            
+            const uploadData = await uploadResponse.json();
+            filename = uploadData.filename || uploadData.public_image_url?.split('/').pop();
+            console.log("🔍 Image uploaded, filename:", filename);
+          } else if (typeof imageToUse === 'string') {
+            filename = imageToUse.split('/').pop();
+            console.log("🔍 Using existing image URL, filename:", filename);
+          }
+          
+          if (!filename) {
+            throw new Error("Could not determine image filename");
+          }
+
+          console.log("🔍 Calling Moondream API with filename:", filename, "query:", query);
+          
+          const response = await fetch(`${backendUrl}/api/v1/vision/point`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              filename: filename,
+              object: query,
+              max_points: 1
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || `Point detection failed: ${response.status}`);
+          }
+          
+          const result = await response.json();
+          console.log("🔍 Moondream result:", result);
+          
+          if (result.points && result.points.length > 0) {
+            setHighlightedCoordinates(result.points);
+            
+            if (highlightTimeoutRef.current) {
+              clearTimeout(highlightTimeoutRef.current);
+            }
+            
+            highlightTimeoutRef.current = setTimeout(() => {
+              setHighlightedCoordinates([]);
+            }, 30000);
+            
+            return {
+              status: 'success',
+              points: result.points,
+              count: result.count,
+              message: `Found ${result.count} instance(s) of ${query}`
+            };
+          } else {
+            return {
+              status: 'success',
+              points: [],
+              count: 0,
+              message: `No instances of ${query} found in the image`
+            };
+          }
+        } catch (error) {
+          console.error("🔍 Error in pointObjectInImage:", error);
+          return {
+            status: 'error',
+            message: error.message || 'Point detection failed',
+            error: error.toString()
+          };
+        }
       },
     },
   });

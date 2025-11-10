@@ -10,9 +10,11 @@ import StopIcon from "@/shared/icons/StopIcon";
 import PlayIcon from "@/shared/icons/PlayIcon";
 // STYLES
 import "./styles.css";
-
+import { useRef } from "react";
 
 const PlayButton = () => {
+  const audioRef = useRef(null);
+
   const toggleCamera = useChatStore((state) => state.toggleCamera);
   const isCameraActive = useChatStore((state) => state.isCameraActive);
   const permissionState = useChatStore((state) => state.permissionState);
@@ -24,7 +26,8 @@ const PlayButton = () => {
   const clearImages = useChatStore((state) => state.clearImages);
   const setAutoCapturing = useChatStore((state) => state.setAutoCapturing);
 
-  const { startConversation, endConversation, isConnecting } = useVoiceConversation();
+  const { startConversation, endConversation, isConnecting } =
+    useVoiceConversation();
   const isConnected = useElevenLabsStore((state) => state.isConnected);
 
   const isLoading = permissionState === PERMISSION_STATES.REQUESTING;
@@ -32,8 +35,18 @@ const PlayButton = () => {
   const showGlow = !isCameraActive && !isConnected;
   const isActive = (isCameraActive && isAudioActive) || isConnected;
 
+  const playConnectionSound = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current
+        .play()
+        .catch((err) => console.log("Audio playback failed:", err));
+    }
+  };
+
   const handleClick = async () => {
     if (!isCameraActive && !isConnected) {
+      playConnectionSound();
       clearImages();
       toggleCamera();
       setTimeout(() => {
@@ -41,10 +54,11 @@ const PlayButton = () => {
           toggleAudio();
         }
       }, 200);
-      
+
       await startConversation();
       setAutoCapturing(true);
     } else {
+      playConnectionSound();
       if (isAudioActive) toggleAudio();
       if (isCameraActive) toggleCamera();
 
@@ -54,7 +68,17 @@ const PlayButton = () => {
   };
 
   return (
-    <div style={{ position: 'relative', width: '150px', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div
+      style={{
+        position: "relative",
+        width: "150px",
+        height: "150px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <audio ref={audioRef} src="/connection.mp3" preload="auto" />
       {isActive && (
         <AudioWaveform isActive={isAudioActive || isConnected} size={135} />
       )}
@@ -62,29 +86,43 @@ const PlayButton = () => {
       <button
         onClick={handleClick}
         disabled={isLoading || isAudioLoading || isConnecting}
-        className={`start-button ${showGlow ? "should-click" : ""} ${isCameraActive || isConnected ? "active" : ""}`}
-        style={{ 
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          position: 'absolute',
+        className={`start-button ${showGlow ? "should-click" : ""} ${
+          isCameraActive || isConnected ? "active" : ""
+        }`}
+        style={{
+          width: "60px",
+          height: "60px",
+          borderRadius: "50%",
+          position: "absolute",
           opacity: isLoading || isAudioLoading || isConnecting ? 0.5 : 1,
-          cursor: isLoading || isAudioLoading || isConnecting ? 'not-allowed' : 'pointer',
+          cursor:
+            isLoading || isAudioLoading || isConnecting
+              ? "not-allowed"
+              : "pointer",
           ...((isCameraActive || isConnected) && {
-            boxShadow: 'inset 0.25rem 0.25rem 0.5rem rgba(163, 177, 198, 0.5), inset -0.25rem -0.25rem 0.5rem rgba(255, 255, 255, 0.8)'
-          })
+            boxShadow:
+              "inset 0.25rem 0.25rem 0.5rem rgba(163, 177, 198, 0.5), inset -0.25rem -0.25rem 0.5rem rgba(255, 255, 255, 0.8)",
+          }),
         }}
       >
-        <div style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div
+          style={{
+            width: "36px",
+            height: "36px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           {isLoading || isAudioLoading || isConnecting ? (
-            <div 
-              style={{ 
-                width: '20px', 
-                height: '20px', 
-                borderRadius: '50%', 
-                border: '2px solid #a3b1c6', 
-                borderTop: '2px solid transparent', 
-                animation: 'spin 1s linear infinite' 
+            <div
+              style={{
+                width: "20px",
+                height: "20px",
+                borderRadius: "50%",
+                border: "2px solid #a3b1c6",
+                borderTop: "2px solid transparent",
+                animation: "spin 1s linear infinite",
               }}
             />
           ) : isCameraActive || isConnected ? (
