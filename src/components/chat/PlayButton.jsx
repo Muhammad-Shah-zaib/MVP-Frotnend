@@ -10,10 +10,9 @@ import StopIcon from "@/shared/icons/StopIcon";
 import PlayIcon from "@/shared/icons/PlayIcon";
 // STYLES
 import "./styles.css";
-import { useRef } from "react";
 
 const PlayButton = () => {
-  const audioRef = useRef(null);
+  
 
   const toggleCamera = useChatStore((state) => state.toggleCamera);
   const isCameraActive = useChatStore((state) => state.isCameraActive);
@@ -35,18 +34,9 @@ const PlayButton = () => {
   const showGlow = !isCameraActive && !isConnected;
   const isActive = (isCameraActive && isAudioActive) || isConnected;
 
-  const playConnectionSound = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current
-        .play()
-        .catch((err) => console.log("Audio playback failed:", err));
-    }
-  };
 
   const handleClick = async () => {
     if (!isCameraActive && !isConnected) {
-      playConnectionSound();
       clearImages();
       toggleCamera();
       setTimeout(() => {
@@ -58,7 +48,6 @@ const PlayButton = () => {
       await startConversation();
       setAutoCapturing(true);
     } else {
-      playConnectionSound();
       if (isAudioActive) toggleAudio();
       if (isCameraActive) toggleCamera();
 
@@ -78,7 +67,7 @@ const PlayButton = () => {
         justifyContent: "center",
       }}
     >
-      <audio ref={audioRef} src="/connection.mp3" preload="auto" />
+  {/* connection audio moved into useVoiceConversation hook */}
       {isActive && (
         <AudioWaveform isActive={isAudioActive || isConnected} size={135} />
       )}

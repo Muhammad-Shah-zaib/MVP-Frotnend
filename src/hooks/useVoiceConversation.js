@@ -1,7 +1,7 @@
 "use client";
 
 import { useChatStore } from "@/store";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useEffect } from "react";
 import { useImageBillboardStore } from "@/store/imageBillboard/imageBillboardStore";
 import { useConversation } from "@elevenlabs/react";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
@@ -67,12 +67,47 @@ export const useVoiceConversation = () => {
 
   const highlightTimeoutRef = useRef(null);
 
+  // Connection audio (played on ElevenLabs connect/disconnect)
+  const connectionAudioRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        connectionAudioRef.current = new Audio("/connection.mp3");
+        connectionAudioRef.current.preload = "auto";
+      } catch (e) {
+        console.debug("Failed to create connection audio:", e);
+      }
+    }
+  }, []);
+
+  const playConnectionSound = () => {
+    try {
+      const audio = connectionAudioRef.current;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch((err) => {
+          // Playback may be blocked by browser autoplay policies; ignore silently
+          console.debug("Connection audio play failed:", err);
+        });
+      }
+    } catch (err) {
+      console.debug("playConnectionSound error:", err);
+    }
+  };
+
   const conversation = useConversation({
     onConnect: () => {
       console.log("Connected to ElevenLabs");
       setConnected(true);
       setConnecting(false);
       setError(null);
+      // Play connection sound on successful connect
+      try {
+        playConnectionSound();
+      } catch (e) {
+        console.debug("Failed to play connection sound on connect:", e);
+      }
     },
     onDisconnect: () => {
       console.log("Disconnected from ElevenLabs");
@@ -80,6 +115,12 @@ export const useVoiceConversation = () => {
       stopCamera();
       clearImages();
       reset();
+      // Play connection sound on disconnect as feedback
+      try {
+        playConnectionSound();
+      } catch (e) {
+        console.debug("Failed to play connection sound on disconnect:", e);
+      }
     },
     onError: (error) => {
       console.error("ElevenLabs error:", error);
