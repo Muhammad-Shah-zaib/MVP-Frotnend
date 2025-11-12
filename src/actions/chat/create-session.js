@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { getClient } from "@/lib/Supabase/server";
 
 export async function createChatSession(userId) {
@@ -26,6 +27,8 @@ export async function createChatSession(userId) {
         error: error.message,
       };
     }
+
+    revalidateTag(`chat-sessions-${userId}`);
 
     console.log("[Create Session] Success:", data.id);
     return {

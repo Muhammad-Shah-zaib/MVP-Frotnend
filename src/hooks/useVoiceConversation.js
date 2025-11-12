@@ -112,10 +112,7 @@ export const useVoiceConversation = () => {
     onDisconnect: () => {
       console.log("Disconnected from ElevenLabs");
       setAutoCapturing(false);
-      stopCamera();
-      clearImages();
       reset();
-      // Play connection sound on disconnect as feedback
       try {
         playConnectionSound();
       } catch (e) {
@@ -273,7 +270,7 @@ export const useVoiceConversation = () => {
     },
   });
 
-  const startConversation = useCallback(async () => {
+  const startConversation = useCallback(async (existingChatId = null) => {
     try {
       setConnecting(true);
       setError(null);
@@ -286,15 +283,21 @@ export const useVoiceConversation = () => {
       }
 
       const userIdToUse = userId || "ANONYMOUS_USER";
+      let chatId;
 
-      console.log("[Voice Conversation] Creating new chat session...");
-      const chatId = await createAndSetChatSession(userIdToUse);
-      
-      if (!chatId) {
-        throw new Error("Failed to create chat session");
+      if (existingChatId) {
+        console.log("[Voice Conversation] Using existing chat session:", existingChatId);
+        chatId = existingChatId;
+      } else {
+        console.log("[Voice Conversation] Creating new chat session...");
+        chatId = await createAndSetChatSession(userIdToUse);
+        
+        if (!chatId) {
+          throw new Error("Failed to create chat session");
+        }
+        console.log("[Voice Conversation] Chat session created:", chatId);
       }
 
-      console.log("[Voice Conversation] Chat session created:", chatId);
       console.log("[Voice Conversation] Fetching memories before starting session...");
       
       const memories = await fetchUserMemories(chatId, userIdToUse);
@@ -348,8 +351,10 @@ export const useVoiceConversation = () => {
   ]);
 
   const endConversation = useCallback(async () => {
+    console.log("[ELEVENLABS] ENDING SESSION")
     try {
       await conversation.endSession();
+      console.log("Conversation ended");
       reset();
     } catch (error) {
       console.error("Failed to end conversation:", error);

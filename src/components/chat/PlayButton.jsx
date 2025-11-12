@@ -5,13 +5,16 @@ import { useChatStore } from "@/store";
 import { useVoiceConversation } from "@/hooks/useVoiceConversation";
 import { useElevenLabsStore } from "@/store/elevenlabs/elevenLabsStore";
 import AudioWaveform from "./AudioWaveform";
-// ICONS
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import StopIcon from "@/shared/icons/StopIcon";
 import PlayIcon from "@/shared/icons/PlayIcon";
-// STYLES
 import "./styles.css";
 
 const PlayButton = () => {
+  const searchParams = useSearchParams();
+  const chatIdFromQuery = searchParams.get('chat_id');
+  const hasAutoStarted = useRef(false);
   
 
   const toggleCamera = useChatStore((state) => state.toggleCamera);
@@ -28,12 +31,39 @@ const PlayButton = () => {
   const { startConversation, endConversation, isConnecting } =
     useVoiceConversation();
   const isConnected = useElevenLabsStore((state) => state.isConnected);
+  const chatId = useElevenLabsStore((state) => state.chatId);
 
   const isLoading = permissionState === PERMISSION_STATES.REQUESTING;
   const isAudioLoading = audioPermissionState === PERMISSION_STATES.REQUESTING;
   const showGlow = !isCameraActive && !isConnected;
   const isActive = (isCameraActive && isAudioActive) || isConnected;
 
+  useEffect(() => {
+    const autoStartConversation = async () => {
+      if (chatIdFromQuery && !hasAutoStarted.current && !isConnected && !isConnecting) {
+        hasAutoStarted.current = true;
+        
+        try {
+          clearImages();
+          toggleCamera();
+          
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          if (!isAudioActive) {
+            toggleAudio();
+          }
+
+          await startConversation(chatIdFromQuery);
+          setAutoCapturing(true);
+        } catch (error) {
+          console.error("[PlayButton] Error auto-starting conversation:", error);
+          hasAutoStarted.current = false;
+        }
+      }
+    };
+
+    autoStartConversation();
+  }, [chatIdFromQuery, isConnected, isConnecting, chatId]);
 
   const handleClick = async () => {
     if (!isCameraActive && !isConnected) {
@@ -48,11 +78,13 @@ const PlayButton = () => {
       await startConversation();
       setAutoCapturing(true);
     } else {
+      setAutoCapturing(false);
+      clearImages();
+      
       if (isAudioActive) toggleAudio();
       if (isCameraActive) toggleCamera();
-
+      
       await endConversation();
-      setAutoCapturing(false);
     }
   };
 

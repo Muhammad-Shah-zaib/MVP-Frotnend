@@ -1,0 +1,1 @@
+export const CHAT_SESSION_TABLE = "chat_sessions";

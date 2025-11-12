@@ -13,6 +13,7 @@ const UploadButton = ({ userId: propUserId }) => {
   const capturedImage = useChatStore((state) => state.capturedImage);
   const uploadedImage = useChatStore((state) => state.uploadedImage);
   const uploadImage = useChatStore((state) => state.uploadImage);
+  const updateSessionCoverImage = useChatStore((state) => state.updateSessionCoverImage);
   const { chatId } = useElevenLabsStore();
   const storeUserId = useUserStore((state) => state.userId);
   const fileInputRef = useRef(null);
@@ -22,8 +23,12 @@ const UploadButton = ({ userId: propUserId }) => {
     if (file && file.type.startsWith("image/")) {
       if (isCameraActive) {
         uploadImage(file);
-        // also send to backend (silent)
-        await uploadToServer(file, chatId, propUserId || storeUserId);
+        const result = await uploadToServer(file, chatId, propUserId || storeUserId);
+        console.log("[UploadButton] upload result:", result);
+        
+        if (result?.public_image_url) {
+          updateSessionCoverImage(result.public_image_url);
+        }
       }
     }
     if (fileInputRef.current) {

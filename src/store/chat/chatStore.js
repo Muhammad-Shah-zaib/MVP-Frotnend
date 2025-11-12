@@ -29,6 +29,7 @@ export const useChatStore = create((set, get) => ({
   similarityThreshold: 10,
   lastImageHash: null,
   lastCaptureTime: 0,
+  currentSession: null,
 
   startCamera: async () => {
     set({
@@ -230,7 +231,13 @@ export const useChatStore = create((set, get) => ({
         (typeof window !== "undefined" && window.LMA_USER_ID) ||
         null;
 
-      uploadToServer(file, conv, uid).catch(() => {});
+      uploadToServer(file, conv, uid).then(data => {
+        console.log("[Capture] upload result:", data);
+        
+        if (data?.public_image_url) {
+          get().updateSessionCoverImage(data.public_image_url);
+        }
+      }).catch(() => {});
     } catch (err) {
       console.info(
         "[Upload] failed to convert and upload captured image:",
@@ -455,6 +462,8 @@ export const useChatStore = create((set, get) => ({
         const setChatId = useElevenLabsStore.getState().setChatId;
         setChatId(result.sessionId);
         
+        set({ currentSession: result.session });
+        
         console.log("[Chat Store] Chat session created:", result.sessionId);
         return result.sessionId;
       } else {
@@ -463,6 +472,55 @@ export const useChatStore = create((set, get) => ({
       }
     } catch (err) {
       console.error("[Chat Store] Error creating chat session:", err);
+      return null;
+    }
+  },
+
+  updateSessionCoverImage: async (publicImageUrl) => {
+    const { currentSession } = get();
+    
+    if (!currentSession || currentSession.cover_image) {
+      return;
+    }
+
+    try {
+      const { updateCoverImage } = await import("@/actions/chat/update-cover-image");
+      
+      const result = await updateCoverImage(currentSession.id, publicImageUrl);
+      
+      if (result.success) {
+        set({ currentSession: result.session });
+        console.log("[Chat Store] Cover image updated:", publicImageUrl);
+      }
+    } catch (err) {
+      console.error("[Chat Store] Error updating cover image:", err);
+    }
+  },
+
+  resumeSession: async (sessionId, userId) => {
+    try {
+      console.log("[Chat Store] Resuming session:", { sessionId, userId });
+
+      const { data: session, error } = await supabaseBrowser
+        .from('chat_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (error || !session) {
+        console.error("[Chat Store] Failed to fetch session:", error);
+        return null;
+      }
+
+      const setChatId = useElevenLabsStore.getState().setChatId;
+      setChatId(session.id);
+      
+      set({ currentSession: session });
+      
+      console.log("[Chat Store] Session resumed:", session.id);
+      return session.id;
+    } catch (err) {
+      console.error("[Chat Store] Error resuming session:", err);
       return null;
     }
   },
