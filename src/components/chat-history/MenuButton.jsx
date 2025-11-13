@@ -31,12 +31,12 @@ const MenuButton = ({ sessionId, userId, currentTitle }) => {
         </PopoverTrigger>
         <PopoverContent className="w-30 p-2 gap-2">
           <div className="flex flex-col">
-            <button 
+            {/* <button 
               className="w-full text-left px-3 py-1 text-sm rounded-md hover:bg-gray-100 transition-colors"
               onClick={(e) => handleMenuItemClick(e)}
             >
               Detail
-            </button>
+            </button> */}
             <SessionRenameDialog
               sessionId={sessionId}
               userId={userId}
